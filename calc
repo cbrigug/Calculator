@@ -1,0 +1,275 @@
+var HEIGHT = getHeight();
+var WIDTH = getWidth();
+var number = "";
+var clear = false;
+var symPosition = 0;
+var equalsPosition = 0;
+var firstNumber = 0;
+var secondNumber = 0;
+var plus = false;
+var subtract = false;
+var multiply = false;
+var divide = false;
+
+function start(){
+    drawBody();
+    drawNumbers();
+    drawGrid();
+    drawSymbols();
+    mouseClickMethod(mouseCoords);
+    
+    
+}
+
+function drawBody(){
+    var screen = new Rectangle(WIDTH-2,HEIGHT/5-3);
+    screen.setPosition(1,1);
+    screen.setColor(Color.black);
+    add(screen);
+    
+    var bodyColor = new Rectangle(WIDTH-3,4*HEIGHT/5-3);
+    bodyColor.setPosition(2,2+HEIGHT/5);
+    bodyColor.setColor(new Color(136, 142, 134));
+    add(bodyColor);
+}
+
+function drawNumbers(){
+    var topRow = 7;        
+    var middleRow = 4;
+    var bottomRow = 1;
+    
+    for(var i = 0; i < 3; i++){
+	    var numbersSevenThroughNine = new Text(topRow, "70pt Arial");
+        numbersSevenThroughNine.setPosition(15+i*WIDTH/12*3,37*HEIGHT/100);
+        numbersSevenThroughNine.setColor(Color.white);
+        add(numbersSevenThroughNine);
+        topRow++;
+    }
+    
+    for(var i = 0; i < 3; i++){
+	    var numbersFourThroughSix = new Text(middleRow, "70pt Arial");
+        numbersFourThroughSix.setPosition(15+i*WIDTH/12*3,57*HEIGHT/100);
+        numbersFourThroughSix.setColor(Color.white);
+        add(numbersFourThroughSix);
+        middleRow++;
+    }
+    
+    for(var i = 0; i < 3; i++){
+	    var numbersOneThroughThree = new Text(bottomRow, "70pt Arial");
+        numbersOneThroughThree.setPosition(15+i*WIDTH/12*3,77*HEIGHT/100);
+        numbersOneThroughThree.setColor(Color.white);
+        add(numbersOneThroughThree);
+        bottomRow++;
+    }
+ 
+    var wayBottom = new Text("0", "70pt Arial");
+    wayBottom.setPosition(15,97*HEIGHT/100);
+    wayBottom.setColor(Color.white);
+    add(wayBottom);
+}
+
+function drawGrid(){
+    for(var i = 0; i < 4; i++){
+	    var verticalLines = new Line(i*WIDTH/4,HEIGHT/5,i*WIDTH/4,HEIGHT);
+        verticalLines.setColor(Color.white);
+        add(verticalLines);
+    }
+    for(var i = 0; i < 4; i++){
+        var horizontalLines = new Line(0,(i+1)*20*HEIGHT/100,WIDTH,(i+1)*20*HEIGHT/100);
+        horizontalLines.setColor(Color.white);
+        add(horizontalLines);
+    }
+}
+
+function drawSymbols(){
+    var division = new Text("÷", "100pt Arial");
+    division.setPosition(15+3*WIDTH/4,40*HEIGHT/100);
+    division.setColor(Color.red);
+    add(division);
+    
+    var multiplication = new Text("×", "100pt Arial");
+    multiplication.setPosition(15+3*WIDTH/4,60*HEIGHT/100);
+    multiplication.setColor(Color.purple);
+    add(multiplication);
+
+    var subtraction = new Text("-", "150pt Arial");
+    subtraction.setPosition(17+3*WIDTH/4,80*HEIGHT/100);
+    subtraction.setColor(Color.orange);
+    add(subtraction);
+
+    var addition = new Text("+", "100pt Arial");
+    addition.setPosition(15+3*WIDTH/4,HEIGHT);
+    addition.setColor(Color.green);
+    add(addition);
+    
+    var equals = new Text("=", "100pt Arial");
+    equals.setPosition(15+2*WIDTH/4,HEIGHT);
+    equals.setColor(Color.blue);
+    add(equals);
+    
+    var clear = new Text("CLR", "30pt Arial");
+    clear.setPosition(10+WIDTH/4,93*HEIGHT/100);
+    clear.setColor(Color.black);
+    add(clear);
+}
+
+function symbol(row, column){
+    if(row==4 && column==4 || row==3 && column==4 || row==2 && column==4 || row==1 && column==4){
+        for(var i = 1; i < number.length; i++){
+            if(number[i]== "+" || number[i]== "-" || number[i]=="x" || number[i]=="÷"){
+               symPosition = i;
+               firstNumber = Number(number.substr(0,symPosition));
+            } 
+        }
+    }
+    
+    if(row==4 && column==3){
+       for(var i = 1; i < number.length; i++){
+           if(number[i]=="="){
+                equalsPosition = i;
+                secondNumber = Number(number.substr(symPosition+1,(equalsPosition-1)-symPosition));
+                for(var i = 1; i < number.length; i++){
+                    if(plus==true){
+                        var sumBoth = firstNumber + secondNumber;
+                        number += sumBoth;
+                        plus = false;
+                    } 
+                    if(subtract==true){
+                        var subtractBoth = firstNumber - secondNumber;
+                        number += subtractBoth
+                        subtract = false;
+                    }
+                    if(multiply==true){
+                        var multiplyBoth = firstNumber * secondNumber;
+                        number += multiplyBoth;
+                        multiply = false;
+                    }
+                    if(divide==true){
+                        var divideBoth = firstNumber / secondNumber;
+                        number += divideBoth;
+                        divide = false;
+                    }
+                }
+           
+            }
+        }
+    }
+}
+
+function mouseCoords(e){
+    
+    for(var i = 1; i < 5; i++){
+        if(e.getY()>=HEIGHT/5 && e.getY()>=HEIGHT/5 *i && e.getY()<=HEIGHT/5*(i+1)){
+            var row = i;
+        }
+    }
+     for(var i = 1; i < 5; i++){
+        if (e.getY()>=HEIGHT/5 && e.getX()>=WIDTH/4*(i-1)  && e.getX()<=WIDTH/4*(i+2)){
+            var column = i;
+        }
+    }
+    
+    var clearCalc = whatToCalculate(row, column);
+    symbol(row, column);
+    
+    for(var i = 0; i < number.length; i++){
+        if(clearCalc==true){
+            number = "";
+            var screen = new Rectangle(WIDTH-2,HEIGHT/5-3);
+            screen.setPosition(1,1);
+            screen.setColor(Color.black);
+            add(screen);
+       
+        } else{
+            var txt = new Text(number[i], "35pt Arial");
+            txt.setPosition(1+(30*([i])), 15*HEIGHT/100);
+            txt.setColor(Color.green);
+            add(txt);
+        }
+    }
+    if(number.length>13){
+            var screen = new Rectangle(WIDTH-2,HEIGHT/5-3);
+            screen.setPosition(1,1);
+            screen.setColor(Color.black);
+            add(screen);
+        
+    for(var i = 0; i < number.length; i++){
+            var txt = new Text(number[i], 35-(number.length-10) +"pt"+" "+ "Arial");
+            txt.setPosition(1+(WIDTH/number.length*([i])), 15*HEIGHT/100);
+            txt.setColor(Color.green);
+            add(txt);
+        }
+    }
+    
+}
+
+function whatToCalculate(row, column){
+    if(row==1 && column==1){
+        number += 7;
+    }
+
+    if(row==1 && column==2){
+        number += 8;
+    }
+    
+    if(row==1 && column==3){
+        number += 9;
+    }
+    
+    if(row==1 && column==4){
+        number += "÷";
+        divide = true;
+    }
+    
+    if(row==2 && column==1){
+        number += 4;
+    }
+    
+    if(row==2 && column==2){
+        number += 5;
+    }
+    
+    if(row==2 && column==3){
+        number += 6;
+    }
+    
+    if(row==2 && column==4){
+        number += "x";
+        multiply = true;
+    }
+    
+    if(row==3 && column==1){
+        number += 1;
+    }
+    
+    if(row==3 && column==2){
+        number += 2;
+    }
+    
+    if(row==3 && column==3){
+        number += 3;
+    }
+    
+    if(row==3 && column==4){
+        number += "-"
+        subtract = true;
+    }
+    
+    if(row==4 && column==1){
+        number += 0;
+    }
+    
+    if(row==4 && column==2){
+        clear = true;
+        return clear;
+    }
+    
+    if(row==4 && column==3){
+        number += "=";
+    }
+    
+    if(row==4 && column==4){
+        number += "+";
+        plus = true;
+    }
+}
